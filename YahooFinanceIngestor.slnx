@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="YahooFinanceIngestor.Tests/YahooFinanceIngestor.Tests.csproj" Id="10d705cb-569e-4d85-9265-fe5c1801d198" />
+  <Project Path="YahooFinanceIngestor/YahooFinanceIngestor.csproj" />
+</Solution>

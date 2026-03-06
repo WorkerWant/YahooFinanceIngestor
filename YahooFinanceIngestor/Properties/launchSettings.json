@@ -1,0 +1,20 @@
+{
+  "profiles": {
+    "YahooFinanceIngestor": {
+      "commandName": "Project"
+    },
+    "Container (Dockerfile)": {
+      "commandName": "Docker",
+      "environmentVariables": {
+        "YAHOO_PG_CONNECTION": "Host=host.docker.internal;Port=5432;Database=yahoo_news;Username=postgres;Password=postgres"
+      }
+    },
+    "Container (Dry-run)": {
+      "commandName": "Docker",
+      "commandLineArgs": "--dry-run",
+      "environmentVariables": {
+        "YAHOO_PG_CONNECTION": "Host=host.docker.internal;Port=5432;Database=yahoo_news;Username=postgres;Password=postgres"
+      }
+    }
+  }
+}

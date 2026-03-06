@@ -1,0 +1,52 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: yahoo-finance-postgres
+    environment:
+      POSTGRES_DB: yahoo_news
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d yahoo_news"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  ingestor:
+    build:
+      context: ./YahooFinanceIngestor
+      dockerfile: Dockerfile
+    container_name: yahoo-finance-ingestor
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      YAHOO_PG_CONNECTION: Host=postgres;Port=5432;Database=yahoo_news;Username=postgres;Password=postgres
+    shm_size: 1gb
+    restart: "no"
+
+  tests:
+    image: mcr.microsoft.com/dotnet/sdk:10.0
+    container_name: yahoo-finance-tests
+    depends_on:
+      postgres:
+        condition: service_healthy
+    working_dir: /workspace
+    environment:
+      YAHOO_TEST_PG_CONNECTION: Host=postgres;Port=5432;Database=yahoo_news;Username=postgres;Password=postgres
+    volumes:
+      - ./:/workspace
+    command:
+      [
+        "bash",
+        "-lc",
+        "rm -rf /tmp/work && mkdir -p /tmp/work && (cd /workspace && tar --exclude=.vs --exclude='*/bin' --exclude='*/obj' -cf - .) | (cd /tmp/work && tar -xf -) && cd /tmp/work/YahooFinanceIngestor.Tests && dotnet test YahooFinanceIngestor.Tests.csproj --nologo"
+      ]
+    restart: "no"
+
+volumes:
+  postgres_data:
